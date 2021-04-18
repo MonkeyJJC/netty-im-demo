@@ -1,0 +1,10 @@
+rootProject.name = 'netty-im-demo'
+include 'netty-im-demo-api'
+include 'netty-im-demo-logic'
+include 'netty-im-demo-integration'
+include 'netty-im-demo-common'
+include 'netty-im-demo-contract'
+include 'netty-im-demo-service'
+include 'netty-im-demo-repository'
+include 'netty-im-demo-client'
+

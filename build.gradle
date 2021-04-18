@@ -1,0 +1,232 @@
+apply plugin: 'base'
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'findbugs'
+
+group = 'com.jjc.service'
+version = '1.0.0'
+sourceCompatibility = 1.8
+
+ext {
+    springBootVersion = '2.0.4.RELEASE'
+    springVersion = '5.0.1.RELEASE'
+    commonsCollectionVersion = '3.2.2'
+    commonsFileUploadVersion = '1.3.3'
+    commonsCodecVersion = '1.10'
+    commonsLangVersion = '3.4'
+    guavaVersion = '19.0'
+    jacksonVersion = '2.9.9'
+    jsonpathVersion = '2.2.0'
+    jmockitVersion = '1.24'
+    lombokVersion = '1.18.6'
+    kafkaVersion = '1.1.0'
+    log4j2Version = '1.2.17'
+    fastjsonVersion = '1.2.76'
+    mysqlConnectorVersion = '5.1.37'
+    log4jVersion = '2.1'
+    dubboVersion = '2.5.3'
+    nettyVersion = '4.1.24.Final'
+    env = System.getProperty("env") == null ? "development" : System.getProperty("env")
+}
+
+buildscript {
+    ext {
+        springBootVersion = '2.0.4.RELEASE'
+        dependencyManagementPluginVersion = '0.6.1.RELEASE'
+    }
+    repositories {
+        maven {
+            url = "https://maven.aliyun.com/repository/public"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.spring.gradle:dependency-management-plugin:$dependencyManagementPluginVersion")
+    }
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact(sourcesJar) {
+                    classifier = 'sources'
+                }
+                pom.withXml {
+                    asNode().dependencies.dependency.each {
+                        dep ->
+                            if (dep.version.text() == "unspecified") {
+                                dep.getAt('groupId').get(0).setValue(project.group)
+                                dep.getAt('version').get(0).setValue(project.version)
+                            }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+subprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    version = parent.version
+    group = parent.group
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    configurations {
+        all*.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+        all*.exclude group: "org.slf4j", module: "slf4j-log4j12"
+        all*.exclude group: "org.apache.logging.log4j", module: "log4j-1.2-api"
+    }
+
+    repositories {
+        mavenLocal()
+        maven { url "https://maven.aliyun.com/repository/public" }
+    }
+
+    sourceSets {
+        main {
+            resources {
+                srcDirs = ["src/main/resources/base", "src/main/resources/$env"]
+            }
+        }
+        test {
+            resources {
+                srcDirs = ["src/test/resources/base", "src/test/resources/$env"]
+            }
+        }
+    }
+
+    if (!it.name.endsWith('-contract')) {
+        dependencies {
+            compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
+            compile "org.springframework.boot:spring-boot-starter-log4j2:$springBootVersion"
+            compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+            compile "org.springframework.boot:spring-boot-starter-aop:$springBootVersion"
+            compile "org.springframework:spring-aspects:$springVersion"
+            compile "com.google.guava:guava:$guavaVersion"
+            compile "commons-collections:commons-collections:$commonsCollectionVersion"
+            compile "commons-codec:commons-codec:$commonsCodecVersion"
+            compile "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
+            compile "org.apache.commons:commons-lang3:$commonsLangVersion"
+            compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+            compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+            compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+            compile("org.apache.kafka:kafka_2.11:$kafkaVersion") {
+                exclude group: "org.slf4j"
+            }
+            compile "com.alibaba:dubbo:$dubboVersion"
+            compile "log4j:log4j:$log4j2Version"
+            compile "com.alibaba:fastjson:$fastjsonVersion"
+            compile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+            compile "org.apache.logging.log4j:log4j-core:$log4jVersion"
+            compile "org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion"
+            compile "io.netty:netty-all:$nettyVersion"
+
+//            compile "io.swagger:swagger-models:$swaggerModels"
+            // --- repository dependencies
+            compile "org.springframework:spring-jdbc:$springVersion"
+            compile "mysql:mysql-connector-java:$mysqlConnectorVersion"
+            compile "org.projectlombok:lombok:$lombokVersion"
+            // ---------------------------
+
+            testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+            testCompile "com.jayway.jsonpath:json-path:$jsonpathVersion"
+            testCompile "com.jayway.jsonpath:json-path-assert:$jsonpathVersion"
+            testCompile "org.jmockit:jmockit:$jmockitVersion"
+        }
+    }
+}
+
+project(":netty-im-demo-api") {
+    apply plugin: 'org.springframework.boot'
+    dependencies {
+        compile project(":netty-im-demo-service")
+        compile "org.apache.kafka:kafka-clients:$kafkaVersion"
+    }
+}
+
+project(":netty-im-demo-contract") {
+    dependencies {
+        compile "org.projectlombok:lombok:$lombokVersion"
+        compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+        compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+        compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+        compile "org.apache.commons:commons-lang3:$commonsLangVersion"
+    }
+}
+
+project(":netty-im-demo-service") {
+    dependencies {
+        compile project(":netty-im-demo-logic")
+        compile project(":netty-im-demo-contract")
+    }
+}
+
+project(":netty-im-demo-logic") {
+    dependencies {
+        compile project(":netty-im-demo-common")
+        compile project(":netty-im-demo-integration")
+        compile project(":netty-im-demo-repository")
+    }
+}
+
+project(":netty-im-demo-integration") {
+    dependencies {
+        //dubbo denpendencies here
+    }
+}
+
+project(":netty-im-demo-common") {
+    dependencies {
+
+    }
+}
+
+project(":netty-im-demo-repository") {
+    dependencies {
+
+    }
+}
+
+project(":netty-im-demo-client") {
+    apply plugin: 'org.springframework.boot'
+    dependencies {
+        compile project(":netty-im-demo-service")
+        compile "org.apache.kafka:kafka-clients:$kafkaVersion"
+    }
+}
+
+// mybatis
+configurations {
+    mybatisGenerator
+}
+repositories {
+    maven { url "https://maven.aliyun.com/repository/public" }
+    mavenCentral()
+}
+dependencies {
+    mybatisGenerator 'org.mybatis.generator:mybatis-generator-core:1.3.2'
+    mybatisGenerator 'mysql:mysql-connector-java:5.1.36'
+    mybatisGenerator 'tk.mybatis:mapper:3.3.6'
+}
+
