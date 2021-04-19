@@ -2,7 +2,7 @@ package com.jjc.service.netty.im.demo.client.handler;
 
 import com.jjc.service.netty.im.demo.client.NettyClient;
 import com.jjc.service.netty.im.demo.common.dto.Invocation;
-import com.jjc.service.netty.im.demo.common.request.HeartbeatRequest;
+import com.jjc.service.netty.im.demo.common.meaasge.HeartbeatRequest;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

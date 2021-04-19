@@ -44,13 +44,14 @@ public class NettyServerHandlerInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) {
         ChannelPipeline channelPipeline = ch.pipeline();
         channelPipeline
-                // 空闲检测
+                // 服务端空闲检测，在超过指定时间未从对端读取到数据，会抛出ReadTimeoutException异常，并关闭channel
                 .addLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS))
                 // 自定义协议的编码器
                 .addLast(new InvocationEncoder())
                 // 解码器
                 .addLast(new InvocationDecoder())
-                // 消息分发
+                // TODO 如果看做一个标准的im系统，这里将会拆为多个微服务，例如业务处理，消息处理，收件箱，存储，离线推送等
+                // 思路1：本长连接服务封装个push接口对外提供，跟im消息处理等服务解耦
                 .addLast(messageDispatcher)
                 // 服务端业务处理
                 .addLast(nettyServerHandler)

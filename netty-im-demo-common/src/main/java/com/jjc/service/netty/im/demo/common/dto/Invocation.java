@@ -28,4 +28,12 @@ public class Invocation {
         this.type = type;
         this.message = JSON.toJSONString(message);
     }
+
+    @Override
+    public String toString() {
+        return "Invocation{" +
+                "type='" + type + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

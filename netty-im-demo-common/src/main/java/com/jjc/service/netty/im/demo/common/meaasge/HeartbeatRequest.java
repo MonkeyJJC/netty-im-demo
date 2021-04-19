@@ -1,6 +1,5 @@
-package com.jjc.service.netty.im.demo.common.request;
+package com.jjc.service.netty.im.demo.common.meaasge;
 
-import com.jjc.service.netty.im.demo.common.meaasge.Message;
 import lombok.Data;
 
 /**
@@ -11,7 +10,7 @@ import lombok.Data;
 @Data
 public class HeartbeatRequest implements Message {
     /**
-     * 类型 - 心跳请求
+     * 类型 - 客户端心跳请求
      */
     public static final String TYPE = "HEARTBEAT_REQUEST";
 }
