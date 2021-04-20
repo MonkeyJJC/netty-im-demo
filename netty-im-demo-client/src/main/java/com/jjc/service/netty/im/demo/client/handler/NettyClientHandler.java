@@ -10,6 +10,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.EventLoop;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,11 +21,13 @@ import java.util.concurrent.TimeUnit;
  * @createTime: 2021/4/15
  */
 @Slf4j
+@Component
 @ChannelHandler.Sharable
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
-    private NettyClient nettyClient;
+    private final NettyClient nettyClient;
 
+    @Lazy
     public NettyClientHandler(NettyClient nettyClient) {
         this.nettyClient = nettyClient;
     }

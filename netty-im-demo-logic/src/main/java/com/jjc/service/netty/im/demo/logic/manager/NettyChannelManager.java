@@ -44,7 +44,7 @@ public class NettyChannelManager {
         }
     }
 
-    private void userRegister(Channel channel, String user) {
+    public void userRegister(Channel channel, String user) {
         Channel existChannel = channels.get(channel.id());
         if (Objects.isNull(existChannel)) {
             log.error("[userRegister][连接({}) 不存在]", channel.id());
@@ -52,6 +52,7 @@ public class NettyChannelManager {
         }
         channel.attr(CHANNEL_ATTR_KEY_USER).set(user);
         userChannels.putIfAbsent(user, channel);
+        log.error("[userRegister][连接({}) 用户({})注册]", channel.id(), user);
     }
 
     public void remove(Channel channel) {

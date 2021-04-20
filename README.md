@@ -7,3 +7,26 @@
 * api:Netty服务端
 * client:Netty客户端
 * service:业务逻辑，提供Netty的基础封装，api与client复用
+
+### Start
+* NettyImDemoApiApplicationContext：启动服务端
+* NettyImDemoClientApplicationContext：启动客户端(注：模型单聊及群聊场景时，启动多个客户端实例即可，建议使用springboot2.x，可以直接使用示例代码更改port启动多实例即可)
+* 测试类：MessageController，本地可以使用postman进行模拟客户端的上行数据
+
+（1）模拟用户连接(长连接注册)
+````
+type ：AUTH_REQUEST
+message ：{"accessToken":"from"}
+````
+
+（2） 模拟单聊消息发送
+````
+type ：SINGLE_CHAT_MESSAGE
+message ： {"fromUser":"from","toUser":"to","msgId":1,"content":"测试发送"}
+````
+
+（2） 模拟群聊消息发送
+````
+type ：GROUP_CHAT_MESSAGE
+message ： {"fromUser":"from","msgId":1,"content":"测试发送"}
+````

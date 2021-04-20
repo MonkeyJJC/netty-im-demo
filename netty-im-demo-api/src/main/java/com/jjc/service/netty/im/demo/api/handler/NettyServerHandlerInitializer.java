@@ -44,7 +44,7 @@ public class NettyServerHandlerInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) {
         ChannelPipeline channelPipeline = ch.pipeline();
         channelPipeline
-                // 服务端空闲检测，在超过指定时间未从对端读取到数据，会抛出ReadTimeoutException异常，并关闭channel
+//                // 服务端空闲检测，在超过指定时间未从对端读取到数据，会抛出ReadTimeoutException异常，并关闭channel
                 .addLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS))
                 // 自定义协议的编码器
                 .addLast(new InvocationEncoder())

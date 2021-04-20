@@ -26,6 +26,6 @@ public class NettyImDemoClientApplicationContext {
 
     @Bean
     public TomcatServletWebServerFactory servletContainer(){
-        return new TomcatServletWebServerFactory(8082) ;
+        return new TomcatServletWebServerFactory(8083) ;
     }
 }

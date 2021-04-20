@@ -44,6 +44,12 @@ public class NettyClient {
      */
     private Channel channel;
 
+    private final NettyClientHandlerInitializer nettyClientHandlerInitializer;
+
+    public NettyClient(NettyClientHandlerInitializer nettyClientHandlerInitializer) {
+        this.nettyClientHandlerInitializer = nettyClientHandlerInitializer;
+    }
+
     /**
      * Netty Client启动
      */
@@ -60,7 +66,7 @@ public class NettyClient {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 // 允许较小的数据包的发送，降低延迟
                 .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new NettyClientHandlerInitializer(NettyClient.this));
+                .handler(nettyClientHandlerInitializer);
         // 连接服务端，并异步等待成功，即启动客户端
         bootstrap.connect().addListener((ChannelFutureListener) future -> {
             // 连接失败

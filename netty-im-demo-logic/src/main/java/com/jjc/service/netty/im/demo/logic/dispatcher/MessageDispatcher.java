@@ -1,15 +1,16 @@
 package com.jjc.service.netty.im.demo.logic.dispatcher;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jjc.service.netty.im.demo.common.dto.Invocation;
 import com.jjc.service.netty.im.demo.common.meaasge.Message;
+import com.jjc.service.netty.im.demo.common.utils.JsonUtils;
 import com.jjc.service.netty.im.demo.logic.handler.MessageHandler;
 import com.jjc.service.netty.im.demo.logic.handler.MessageHandlerHolder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @author: jjc
  * @createTime: 2021/4/14
  */
-@Service
+@Component
 @ChannelHandler.Sharable
 public class MessageDispatcher extends SimpleChannelInboundHandler<Invocation> {
 
@@ -45,9 +46,10 @@ public class MessageDispatcher extends SimpleChannelInboundHandler<Invocation> {
                     new LinkedBlockingDeque<>(MAX_QUEUE_SIZE),
                     FUTURE_THREAD_FACTORY);
 
-    private final MessageHandlerHolder messageHandlerHolder;
+    private MessageHandlerHolder messageHandlerHolder;
 
-    public MessageDispatcher(MessageHandlerHolder messageHandlerHolder) {
+    @Autowired
+    public void setMessageHandlerHolder(MessageHandlerHolder messageHandlerHolder) {
         this.messageHandlerHolder = messageHandlerHolder;
     }
 
@@ -55,7 +57,7 @@ public class MessageDispatcher extends SimpleChannelInboundHandler<Invocation> {
     protected void channelRead0(ChannelHandlerContext ctx, Invocation msg) {
         MessageHandler messageHandler = messageHandlerHolder.getMessageHandler(msg.getType());
         Class<? extends Message> msgClass = MessageHandlerHolder.getMessageClass(messageHandler);
-        Message message = JSON.parseObject(msg.getMessage(), msgClass);
+        Message message = JsonUtils.fromJson(msg.getMessage(), msgClass);
         // 不要在Netty的I/O线程上执行任何非CPU限定的代码，会影响服务器的吞吐量，一般切换到另一个不同的线程
         EXECUTOR.submit(() -> {
             // noinspection unchecked

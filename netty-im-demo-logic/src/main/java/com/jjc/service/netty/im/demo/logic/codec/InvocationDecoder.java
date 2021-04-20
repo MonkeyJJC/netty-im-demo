@@ -1,7 +1,7 @@
 package com.jjc.service.netty.im.demo.logic.codec;
 
-import com.alibaba.fastjson.JSON;
 import com.jjc.service.netty.im.demo.common.dto.Invocation;
+import com.jjc.service.netty.im.demo.common.utils.JsonUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -37,7 +37,7 @@ public class InvocationDecoder extends ByteToMessageDecoder {
         }
         byte[] content = new byte[length];
         in.readBytes(content);
-        Invocation msg = JSON.parseObject(content, Invocation.class);
+        Invocation msg = JsonUtils.fromJson(content, Invocation.class);
         // 添加到List<Object> out中，交给后续的ChannelHandler进行处理
         out.add(msg);
         log.info("[decode][连接({}) 解析到一条消息({})]", ctx.channel().id(), msg.toString());

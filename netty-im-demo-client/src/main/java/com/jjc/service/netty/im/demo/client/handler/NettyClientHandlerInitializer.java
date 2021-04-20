@@ -1,6 +1,5 @@
 package com.jjc.service.netty.im.demo.client.handler;
 
-import com.jjc.service.netty.im.demo.client.NettyClient;
 import com.jjc.service.netty.im.demo.logic.codec.InvocationDecoder;
 import com.jjc.service.netty.im.demo.logic.codec.InvocationEncoder;
 import com.jjc.service.netty.im.demo.logic.dispatcher.MessageDispatcher;
@@ -30,9 +29,10 @@ public class NettyClientHandlerInitializer extends ChannelInitializer<Channel> {
         this.messageDispatcher = messageDispatcher;
     }
 
-    private final NettyClientHandler nettyClientHandler;
-    public NettyClientHandlerInitializer(NettyClient nettyClient) {
-        this.nettyClientHandler = new NettyClientHandler(nettyClient);
+    private NettyClientHandler nettyClientHandler;
+    @Autowired
+    public void setNettyClientHandler(NettyClientHandler nettyClientHandler) {
+        this.nettyClientHandler = nettyClientHandler;
     }
 
     @Override
